@@ -124,6 +124,6 @@ npm run dev
 | Resource | Link |
 |----------|------|
 | 🖥️ Live Demo | [Portal](v0-studentdropoutsystem.vercel.app/) |
-| 📁 Repository | [GitHub](https://github.com/deepro0204) |
+| 📁 Repository | [GitHub](https://github.com/deepro0204/Student-Droupout-System) |
 
 ---
