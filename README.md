@@ -123,7 +123,7 @@ npm run dev
 
 | Resource | Link |
 |----------|------|
-| 🖥️ Live Demo | *Coming soon* |
+| 🖥️ Live Demo | [Portal](v0-studentdropoutsystem.vercel.app/) |
 | 📁 Repository | [GitHub](https://github.com/deepro0204) |
 
 ---
