@@ -1,0 +1,12 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# env
+.env
+
+# generated model outputs (keep the checked-in .pkl artifacts)
+data/final_with_risk.csv

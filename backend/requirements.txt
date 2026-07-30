@@ -1,0 +1,16 @@
+# CareSphere backend — runtime dependencies
+# (no pandas / scikit-learn needed: data is loaded with the stdlib csv module
+#  and risk scoring is deterministic rule-based Python.)
+fastapi==0.141.1
+uvicorn[standard]==0.52.0
+pydantic==2.13.4
+pydantic-settings==2.14.2
+PyJWT==2.13.0
+httpx==0.28.1
+
+# Optional — only needed to re-train the RandomForest model via risk_flagging.py:
+# pandas
+# scikit-learn
+# matplotlib
+# seaborn
+# joblib

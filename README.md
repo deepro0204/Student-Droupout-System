@@ -1,9 +1,13 @@
+<div align="center">
+
+# CareSphere
+
 **AI-Based Student Dropout Prediction & Counseling Platform**
 
 [![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org/)
-[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
-[![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white)](https://vercel.com/)
+[![Gemini](https://img.shields.io/badge/Gemini-8E75B2?style=flat-square&logo=google&logoColor=white)](https://ai.google.dev/)
 [![TailwindCSS](https://img.shields.io/badge/Tailwind-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
 </div>
@@ -12,118 +16,122 @@
 
 ## 🎯 What is CareSphere?
 
-CareSphere is a **centralized digital platform** that tackles the silent crisis of student attrition in educational institutions. Instead of reactive damage control, CareSphere enables **proactive intervention** — identifying at-risk students *before* they disengage.
+CareSphere is a platform that tackles student attrition by identifying at-risk
+students *before* they disengage. It consolidates fragmented academic data,
+scores dropout risk, explains *why* a student is flagged, and drives
+intervention through counseling workflows and parent alerts.
 
-It replaces fragmented spreadsheets and siloed department data with a **unified AI-driven ecosystem** that delivers real-time risk alerts, counseling access, and intervention tracking — all in one place.
+## 🗂️ Repository Layout
 
----
+```
+Student-Droupout-System/
+├── frontend/          # Next.js 14 + React + Tailwind UI (role-based dashboards)
+├── backend/           # FastAPI service: predictions, insights, auth, email
+│   ├── app/           #   application code (routers, services, store)
+│   ├── data/          #   source CSVs (loaded in-memory on startup)
+│   ├── models/        #   trained RandomForest artifacts (.pkl) + report
+│   └── risk_flagging.py  # optional model-training script
+├── docs/              # full project documentation (see below)
+└── README.md
+```
 
 ## 🧠 How It Works
 
 ```
-📤 Data Upload  →  🔄 ETL Pipeline  →  🤖 ML Inference  →  📊 Risk Dashboard  →  🔔 Intervention
+📤 Data (CSV)  →  🔄 In-memory merge  →  🤖 Risk engine + Gemini  →  📊 Dashboards  →  🔔 Parent alerts
 ```
 
-1. Teachers/admins upload semester data via the frontend
-2. An automated **ETL job** cleans, normalizes, and engineers features
-3. The **Hybrid AI model** predicts dropout risk per student
-4. Results are stored and visualized as color-coded risk alerts
-5. High-risk flags trigger **instant mentor-to-parent notifications**
+- **Risk engine** — a deterministic, explainable rule engine (see
+  `backend/app/services/risk_service.py`) reproduces the exact logic the
+  RandomForest was trained on, and returns a 0–100 score plus contributing factors.
+- **AI insights** — Google **Gemini** generates behavioral indicators,
+  projections, and intervention suggestions. Without an API key it degrades
+  gracefully to deterministic fallback insights.
+- **Alerts** — SMTP-backed parent emails (dry-run when SMTP is unconfigured).
 
----
+## 📚 Documentation
 
-## 🤖 The Hybrid AI Engine
+Full documentation lives in [`docs/`](docs/):
 
-CareSphere doesn't use a black-box model. It combines two complementary approaches:
-
-| Component | Role |
-|-----------|------|
-| 🌲 **Random Forest (ML)** | Detects subtle, non-linear patterns in academic & behavioral data |
-| 📏 **Rule-Based Logic** | Enforces institution-defined thresholds (e.g., attendance < 75% = risk) |
-
-**Output — Color-Coded Risk Alerts:**
-
-🔴 **Red** → High Risk · Immediate intervention needed  
-🟡 **Yellow** → Moderate Risk · Close monitoring required  
-🟢 **Green** → Low Risk · Baseline performance
-
-> Each prediction comes with **Explainable AI (XAI)** — counselors see *why* a student is flagged, not just that they are.
-
----
+| Doc | Covers |
+|-----|--------|
+| [architecture.md](docs/architecture.md) | System overview, components, request flow, design decisions |
+| [setup.md](docs/setup.md) | Local dev setup for backend + frontend, troubleshooting |
+| [configuration.md](docs/configuration.md) | Every environment variable (backend + frontend) |
+| [api-reference.md](docs/api-reference.md) | All REST endpoints with request/response examples |
+| [authentication.md](docs/authentication.md) | JWT flow, roles, demo accounts, hardening |
+| [risk-scoring.md](docs/risk-scoring.md) | The risk engine, thresholds, scoring, model relationship |
+| [data-model.md](docs/data-model.md) | CSV schema, in-memory store, student record shape |
+| [gemini.md](docs/gemini.md) | Gemini insights, config, structured output, fallback |
+| [email.md](docs/email.md) | Alert types, SMTP setup, dry-run behavior |
+| [deployment.md](docs/deployment.md) | Production deployment, CORS, env matrix |
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| **Frontend** | Next.js, React, Tailwind CSS, Radix UI |
-| **Backend** | Next.js Server Routes, Supabase (BaaS) |
-| **Database** | PostgreSQL (via Supabase) with Row-Level Security |
-| **ML/AI** | Python, Random Forest, Custom ETL Pipeline |
-| **Auth** | Supabase Auth + Role-Based Access Control (RBAC) |
-| **Deployment** | Vercel |
-| **Version Control** | GitHub |
-
----
-
-## 👥 Role-Based Access
-
-CareSphere enforces strict **Row Level Security (RLS)** — each user only sees what they're meant to:
-
-- 🎓 **Student** — Views their own risk profile and counseling resources
-- 🧑‍🏫 **Teacher** — Uploads data, monitors assigned students
-- 🩺 **Counselor** — Views flagged students, logs interventions
-- 🔐 **Admin** — System-wide oversight and configuration
-
----
-
-## 📊 Data Model
-
-The system consolidates fragmented institutional data into structured, validated tables:
-
-- **Student Demographics** — Identification and background
-- **Academic Performance** — Grades, scores, historical trends
-- **Engagement Metrics** — Attendance and participation records
-- **Risk Profiles** — ML predictions with categories: `Low | Optimistic | Pessimistic | Mitigation`
-
----
-
-## ⚡ Key Features
-
-- 🔄 **Automated ETL Pipeline** — Runs on every data update, no manual processing
-- 📉 **Trend-Based Feature Engineering** — Tracks grade trajectory, not just static scores
-- 🔔 **Notification System** — Closes the loop from insight → intervention automatically
-- 🔒 **Encrypted Data** — At rest and in transit, built for government-grade data sovereignty
-- ☁️ **Serverless & Scalable** — From single institute to state-level deployment, no special hardware needed
+| Layer      | Technology |
+|------------|-----------|
+| Frontend   | Next.js, React, Tailwind CSS, Radix UI |
+| Backend    | FastAPI, Uvicorn, Pydantic |
+| AI         | Google Gemini (REST) + rule-based scoring |
+| Auth       | JWT (PyJWT) with role-based accounts |
+| ML (train) | Python, scikit-learn RandomForest |
 
 ---
 
 ## 🚀 Getting Started
 
+The frontend and backend run as **two separate processes**.
+
+### 1. Backend (FastAPI — port 8000)
+
 ```bash
-# Clone the repository
-git clone https://github.com/deepro0204/caresphere.git
-cd caresphere
+cd backend
+python -m venv .venv
+.venv\Scripts\activate            # Windows  ·  source .venv/bin/activate on macOS/Linux
+pip install -r requirements.txt
+copy .env.example .env            # optional — safe defaults work out of the box
+python run.py
+```
 
-# Install dependencies
-npm install
+API: `http://localhost:8000/api` · Swagger docs: `http://localhost:8000/docs`
+See [`backend/README.md`](backend/README.md) for the full endpoint reference.
 
-# Set up environment variables
-cp .env.example .env.local
-# Add your Supabase URL, anon key, and other secrets
+### 2. Frontend (Next.js — port 3000)
 
-# Run development server
+```bash
+cd frontend
+npm install       # or: pnpm install
 npm run dev
 ```
 
-> 📌 Requires a Supabase project with the schema set up. See `/docs/schema.sql` for the database structure.
+Open `http://localhost:3000`. The frontend calls the backend at
+`http://localhost:8000/api` by default; override with `NEXT_PUBLIC_API_URL`
+in `frontend/.env.local`:
+
+```
+NEXT_PUBLIC_API_URL=http://localhost:8000/api
+```
+
+### Demo accounts (password: `password`)
+
+| Role      | Email                   |
+|-----------|-------------------------|
+| Student   | student1@example.com    |
+| Teacher   | teacher1@example.com    |
+| Admin     | admin1@example.com      |
+| Counselor | counselor1@example.com  |
 
 ---
 
-## 🔗 Links
+## 👥 Role-Based Access
 
-| Resource | Link |
-|----------|------|
-| 🖥️ Live Demo | [Portal](v0-studentdropoutsystem.vercel.app/) |
-| 📁 Repository | [GitHub](https://github.com/deepro0204/Student-Droupout-System) |
+- 🎓 **Student** — own risk profile and recommendations
+- 🧑‍🏫 **Teacher** — student roster and class analytics
+- 🩺 **Counselor** — high-risk students, interventions, reports
+- 🔐 **Admin** — system-wide oversight
 
----
+## 🤖 Re-training the model (optional)
+
+`backend/risk_flagging.py` trains the RandomForest and regenerates plots +
+`data/final_with_risk.csv`. It needs the optional ML dependencies listed at the
+bottom of `backend/requirements.txt`. The live API does **not** require them.

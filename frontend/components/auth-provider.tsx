@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { apiFetch, setToken } from "@/lib/api-client"
 
 export type UserRole = "student" | "teacher" | "admin" | "counselor"
 
@@ -36,29 +37,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true)
-
-    const mockUsers = [
-      { id: "1", name: "Student1", email: "student1@example.com", role: "student" as UserRole, studentId: "STU001" },
-      { id: "2", name: "Teacher1", email: "teacher1@example.com", role: "teacher" as UserRole },
-      { id: "3", name: "Admin1", email: "admin1@example.com", role: "admin" as UserRole },
-      { id: "4", name: "Counselor1", email: "counselor1@example.com", role: "counselor" as UserRole },
-    ]
-
-    const foundUser = mockUsers.find((u) => u.email === email && password === "password")
-
-    if (foundUser) {
-      setUser(foundUser)
-      localStorage.setItem("user", JSON.stringify(foundUser))
-      setIsLoading(false)
+    try {
+      const data = await apiFetch<{ access_token: string; user: User }>("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      })
+      setToken(data.access_token)
+      setUser(data.user)
+      localStorage.setItem("user", JSON.stringify(data.user))
       return true
+    } catch (error) {
+      console.error("Login failed:", error)
+      return false
+    } finally {
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
-    return false
   }
 
   const logout = () => {
     setUser(null)
+    setToken(null)
     localStorage.removeItem("user")
   }
 
